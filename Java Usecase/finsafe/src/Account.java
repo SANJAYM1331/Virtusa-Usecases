@@ -50,7 +50,7 @@ public class Account {
     }
 
     public void printMiniStatement() {
-        System.out.println("\n========= Mini Statement =========");
+        System.out.println("\n       Mini Statement       ");
         System.out.println("Account Holder : " + accountHolder);
         System.out.println("Current Balance: ₹" + balance);
         System.out.println("Last " + transactionHistory.size() + " Transactions:");
@@ -61,6 +61,5 @@ public class Account {
                 System.out.println("  " + (i + 1) + ". " + transactionHistory.get(i));
             }
         }
-        System.out.println("==================================\n");
     }
 }
