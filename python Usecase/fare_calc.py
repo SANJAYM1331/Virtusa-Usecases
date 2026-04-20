@@ -5,7 +5,7 @@ vehicle_rates = {
     'Sedan': 30
 }
 
-def calculate_fare(km, vtype, hour):
+def calc_fare(km, vtype, hour):
     if vtype not in vehicle_rates:
         raise ValueError("Sorry, we don't support: " + vtype)
     
@@ -22,7 +22,7 @@ vtype = input("Vehicle type: ").strip().capitalize()
 hour = int(input("Hour of day (0-23): "))
 
 try:
-    base, surge, total = calculate_fare(km, vtype, hour)
+    base, surge, total = calc_fare(km, vtype, hour)
 
     print("\n   Fare Breakdown    ")
     print(f"Vehicle   : {vtype}")
