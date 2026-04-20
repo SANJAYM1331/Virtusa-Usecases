@@ -18,12 +18,11 @@ public class Main {
         int choice = 0;
 
         while (choice != 4) {
-            System.out.println("\n========= FinSafe Menu =========");
+            System.out.println("\n        FinSafe Menu       ");
             System.out.println("1. Deposit");
             System.out.println("2. Withdraw / Spend");
             System.out.println("3. View Mini Statement");
             System.out.println("4. Exit");
-            System.out.println("================================");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
 
@@ -56,11 +55,11 @@ public class Main {
                     break;
 
                 case 4:
-                    System.out.println("\nThank you for using FinSafe. Have a good day!");
+                    System.out.println("\nThank you for using FinSafe!");
                     break;
 
                 default:
-                    System.out.println("Invalid choice. Please enter 1-4.");
+                    System.out.println("Invalid choice. Please enter a valid input");
             }
         }
 
