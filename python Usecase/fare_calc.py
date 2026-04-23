@@ -19,7 +19,9 @@ print("    CityCab Fare Calculator    \n")
 km = float(input("Distance (km): "))
 print("Vehicle options: Economy, Premium, SUV, Sedan")
 vtype = input("Vehicle type: ").strip().capitalize()
-hour = int(input("Hour of day (0-23): "))
+time_input = input("Enter time (HH:MM): ").strip()
+hours, minutes = time_input.split(":")
+hour = int(hours) + int(minutes) / 60
 
 try:
     base, surge, total = calc_fare(km, vtype, hour)
