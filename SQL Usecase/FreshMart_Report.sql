@@ -1,27 +1,42 @@
+CREATE DATABASE freshmart;
+USE freshmart;
+
+-- SCHEMA DESIGN
+
 CREATE TABLE Categories (
-    CategoryID INT PRIMARY KEY AUTO_INCREMENT,
+    CategoryID   INT          PRIMARY KEY AUTO_INCREMENT,
     CategoryName VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Products (
-    ProductID INT PRIMARY KEY AUTO_INCREMENT,
-    ProductName VARCHAR(150) NOT NULL,
-    CategoryID INT,
-    StockCount INT DEFAULT 0,
-    ExpiryDate DATE,
-    CostPrice DECIMAL(10,2),
+    ProductID    INT           PRIMARY KEY AUTO_INCREMENT,
+    ProductName  VARCHAR(150)  NOT NULL,
+    CategoryID   INT,
+    StockCount   INT           DEFAULT 0,
+    ExpiryDate   DATE,
+    CostPrice    DECIMAL(10,2),
     SellingPrice DECIMAL(10,2),
     FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
 );
 
 CREATE TABLE SalesTransactions (
-    TransactionID INT PRIMARY KEY AUTO_INCREMENT,
-    ProductID INT,
-    QuantitySold INT,
-    SaleDate DATE,
-    TotalAmount DECIMAL(10,2),
+    TransactionID INT           PRIMARY KEY AUTO_INCREMENT,
+    ProductID     INT,
+    QuantitySold  INT,
+    SaleDate      DATE,
+    TotalAmount   DECIMAL(10,2),
     FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
 );
+
+-- INDEXING
+-- Applied on columns used in WHERE and JOIN
+
+CREATE INDEX idx_expiry_date ON Products(ExpiryDate);
+CREATE INDEX idx_stock_count ON Products(StockCount);
+CREATE INDEX idx_sale_date   ON SalesTransactions(SaleDate);
+CREATE INDEX idx_product_id  ON SalesTransactions(ProductID);
+
+-- INSERT DATA
 
 INSERT INTO Categories (CategoryName) VALUES
 ('Dairy'),
@@ -30,7 +45,9 @@ INSERT INTO Categories (CategoryName) VALUES
 ('Snacks'),
 ('Frozen Foods');
 
-INSERT INTO Products (ProductName, CategoryID, StockCount, ExpiryDate, CostPrice, SellingPrice) VALUES
+INSERT INTO Products
+    (ProductName, CategoryID, StockCount, ExpiryDate, CostPrice, SellingPrice)
+VALUES
 ('Whole Milk 1L',        1, 120, CURDATE() + INTERVAL 3 DAY,  40.00,  55.00),
 ('Cheddar Cheese 200g',  1,  80, CURDATE() + INTERVAL 5 DAY,  90.00, 120.00),
 ('White Bread',          2,  60, CURDATE() + INTERVAL 2 DAY,  25.00,  35.00),
@@ -39,10 +56,12 @@ INSERT INTO Products (ProductName, CategoryID, StockCount, ExpiryDate, CostPrice
 ('Green Tea Bags',       3, 200, CURDATE() + INTERVAL 90 DAY, 80.00, 110.00),
 ('Potato Chips 100g',    4, 150, CURDATE() + INTERVAL 60 DAY, 20.00,  35.00),
 ('Chocolate Biscuits',   4,  55, CURDATE() + INTERVAL 4 DAY,  45.00,  65.00),
-('Frozen Pizza',         5,  40, CURDATE() + INTERVAL 30 DAY, 150.00,200.00),
-('Ice Cream 500ml',      5,  70, CURDATE() + INTERVAL 20 DAY, 100.00,140.00);
+('Frozen Pizza',         5,  40, CURDATE() + INTERVAL 30 DAY, 150.00, 200.00),
+('Ice Cream 500ml',      5,  70, CURDATE() + INTERVAL 20 DAY, 100.00, 140.00);
 
-INSERT INTO SalesTransactions (ProductID, QuantitySold, SaleDate, TotalAmount) VALUES
+INSERT INTO SalesTransactions
+    (ProductID, QuantitySold, SaleDate, TotalAmount)
+VALUES
 (1,  5, CURDATE() - INTERVAL 5 DAY,   275.00),
 (1,  3, CURDATE() - INTERVAL 10 DAY,  165.00),
 (2,  2, CURDATE() - INTERVAL 3 DAY,   240.00),
@@ -54,10 +73,10 @@ INSERT INTO SalesTransactions (ProductID, QuantitySold, SaleDate, TotalAmount) V
 (9,  2, CURDATE() - INTERVAL 40 DAY,  400.00),
 (10, 4, CURDATE() - INTERVAL 12 DAY,  560.00);
 
-
 -- REPORT 1: Expiring Soon
+-- Products expiring within 7 days with stock > 50
 
-SELECT 
+SELECT
     p.ProductID,
     p.ProductName,
     c.CategoryName,
@@ -66,13 +85,14 @@ SELECT
     DATEDIFF(p.ExpiryDate, CURDATE()) AS DaysUntilExpiry
 FROM Products p
 JOIN Categories c ON p.CategoryID = c.CategoryID
-WHERE p.ExpiryDate BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+WHERE p.ExpiryDate BETWEEN CURDATE()
+      AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
   AND p.StockCount > 50;
 
-
 -- REPORT 2: Dead Stock
+-- Products with zero sales in the last 60 days
 
-SELECT 
+SELECT
     p.ProductID,
     p.ProductName,
     c.CategoryName,
@@ -85,10 +105,9 @@ WHERE p.ProductID NOT IN (
     WHERE SaleDate >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
 );
 
-
 -- REPORT 3: Revenue by Category (Last Month)
 
-SELECT 
+SELECT
     c.CategoryName,
     SUM(st.TotalAmount) AS TotalRevenue
 FROM SalesTransactions st
